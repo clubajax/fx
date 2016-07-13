@@ -29,25 +29,33 @@
     <script>
 
         var node = dom.byId('1');
-        fx.opacity(node, {
-            opacity: 0,
-            callback: function () {
-                fx.opacity(node, {
-                    opacity: 1,
-                    callback: function () {
-                        console.log('0.2....');
-                        fx.opacity(node, {
-                            opacity: 0.2,
-                            callback: function () {
-                                fx.opacity(node, {
-                                    opacity: 0.7
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
+
+        function opacity() {
+            fx.opacity(node, {
+                opacity: 0,
+                callback: function () {
+                    fx.opacity(node, {
+                        opacity: 1,
+                        callback: function () {
+                            console.log('0.2....');
+                            fx.opacity(node, {
+                                opacity: 0.2,
+                                callback: function () {
+                                    fx.opacity(node, {
+                                        opacity: 0.7
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function height () {
+            fx.collapse(node);
+        }
+        setTimeout(height, 700);
 
     </script>
 </body>

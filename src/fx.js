@@ -22,14 +22,8 @@
 
     var fx = {
 
-        wipe: {
-            in: function (node, options) {
+        height: function (node, options) {
 
-            },
-
-            out: function (node, options) {
-
-            }
         },
 
         collapse: function(node, immediate, callback, targetHeight) {
@@ -48,27 +42,39 @@
                 return;
             }
 
-            node.style.height  = '';
+
 
             var
-                cls = 'transition-height',
-                height = this.getContentHeight(node);
+                sizes = getSizes(node),
+                height = sizes.height,
+                speed = 1500,
+                transition = 'all '+speed+'ms ease';
 
-            node._collapsed = 1;
+            node.style.height  = '';
+
             node.style.height = height + 'px';
-            node.classList.add(cls);
+            dom.style(node, {
+                overflow: 'hidden',
+                transition: transition
+            });
 
             on.once(node, 'transitionend', function() {
-                node.classList.remove(cls);
-                if (!targetHeight && node._collapsed === 1) {
+                console.log('transitionend');
+                dom.style(node, {
+                    transition: ''
+                });
+                if (!targetHeight) {
                     node.style.display = 'none';
-                    node.style.height  = '';
+                    //node.style.height  = '';
                 }
             });
             handleCallback(node, immediate, callback, 'collapse');
-            alloy.defer.nextTick(function() {
+            // tick does not work here for some reason
+            setTimeout(function() {
                 node.style.height = targetHeight ? targetHeight + 'px' : '0';
-            });
+                node.style.paddingTop = 0;
+                node.style.paddingBottom = 0;
+            },1);
         },
 
         expand: function(node, immediate, callback, startHeight) {
@@ -114,7 +120,7 @@
                 endOpacity = options.opacity === undefined ? begOpacity < 0.5 ? 1 : 0 : options.opacity,
                 speed = options.speed || 400,
                 style = 'all '+speed+'ms ease';
-            
+
             if (immediate === true || dom.style(node, 'opacity') === endOpacity) {
                 node.style.opacity = endOpacity;
                 if (callback) {
@@ -227,35 +233,62 @@
                 }.bind(this));
                 this.overlayNode.classList.remove('show');
             }
-        },
-
-        getContentHeight: function(node) {
-            if (!node) {
-                return 0;
-            }
-
-            var previousHeight = node.style.height,
-                previousHeightInPx = parseInt(previousHeight, 10);
-
-            if (previousHeightInPx > 0) {
-                return previousHeightInPx;
-            }
-
-            var
-                height,
-                previousDisplay = node.style.display;
-
-            node.style.height = '';
-            node.style.display = '';
-
-            height = node === window ? node.innerHeight : node.getBoundingClientRect().height;
-
-            node.style.height = previousHeight;
-            node.style.display = previousDisplay;
-
-            return height;
         }
     };
+
+    function getContentHeight (node) {
+        if (!node) {
+            return 0;
+        }
+
+        var
+            height,
+            previousDisplay,
+            previousHeight = node.style.height,
+            previousHeightInPx = parseInt(previousHeight, 10);
+
+        if (previousHeightInPx > 0) {
+            return previousHeightInPx;
+        }
+
+        previousDisplay = node.style.display;
+
+        node.style.height = '';
+        node.style.display = '';
+
+        // are we ever animating window??
+        height = node === window ? node.innerHeight : node.getBoundingClientRect().height;
+
+        node.style.height = previousHeight;
+        node.style.display = previousDisplay;
+
+        return height;
+    }
+
+    function getSizes (node) {
+        var
+            box,
+            height,
+            previousDisplay = node.style.display,
+            previousHeight = dom.style(node, 'height'),
+            padTop = dom.style(node, 'paddingTop'),
+            padBot = dom.style(node, 'paddingBottom');
+
+        node.style.height = '';
+        node.style.display = '';
+
+        box = dom.box(node);
+
+        dom.style(node, {
+            height: previousHeight,
+            display: previousDisplay
+        });
+
+        box.height = box.height - padTop - padBot;
+
+        return box;
+
+    }
 
     window.fx = fx;
 }());

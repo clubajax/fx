@@ -43,7 +43,7 @@
 
             function xsuite () {}
             function xtest () {}
-            suite('fx.opacity', function () {
+            xsuite('fx.opacity', function () {
                 test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.opacity(node, {
@@ -157,7 +157,7 @@
                 });
             });
 
-            xsuite('fx.wipe', function () {
+            xsuite('fx.height', function () {
                 test('it should collapse', function (done) {
 
                 });
