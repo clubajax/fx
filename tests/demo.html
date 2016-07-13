@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <title>Test fx</title>
+    <script src="https://rawgit.com/clubajax/dom/master/src/dom.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
+    <script src="../src/fx.js"></script>
+    <style>
+        body{
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .fade-me{
+            border: 1px solid #666;
+            background: #ffb5b7;
+            padding: 10px;
+            display: inline-block;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>fx test</h1>
+    <div id="mocha"></div>
+    <div class="fade-me" id="1">
+        This div is for opacity tests
+    </div>
+    <script>
+
+        var node = dom.byId('1');
+        fx.fade.out(node);
+
+    </script>
+</body>
+</html>

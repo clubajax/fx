@@ -9,10 +9,15 @@
     function handleCallback(node, immediate, callback, type) {
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
         if (cb && immediate !== true) {
-            alloy.on.once(node, 'transitionend', function() {
+            on.once(node, 'transitionend', function() {
+                //setTimeout(cb, 500);
                 cb();
             });
         }
+    }
+
+    function tick (callback) {
+        window.requestAnimationFrame(callback);
     }
 
     var fx = {
@@ -43,7 +48,7 @@
             node.style.height = height + 'px';
             node.classList.add(cls);
 
-            alloy.on.once(node, 'transitionend', function() {
+            on.once(node, 'transitionend', function() {
                 node.classList.remove(cls);
                 if (!targetHeight && node._collapsed === 1) {
                     node.style.display = 'none';
@@ -78,7 +83,7 @@
             node.classList.add(cls);
             node.style.display = '';
 
-            alloy.on.once(node, 'transitionend', function() {
+            on.once(node, 'transitionend', function() {
                 if (node._collapsed == 0) {
                     node.classList.remove(cls);
                     node.style.height = '';
@@ -92,31 +97,39 @@
 
         fade: {
             out: function(node, options) {
-                // TODO: allow for different animation duration
 
+                console.log('OUT');
                 options = options || {};
                 var
                     immediate = options.immediate,
                     callback = options.callback,
-                    cls = 'fadeable';
+                    speed = options.speed || 400,
+                    style = 'all '+speed+'ms ease';
+
 
                 if (immediate === true || dom.style(node, 'opacity') === 0) {
                     node.style.opacity = 0;
                     if (callback) {
-                        alloy.defer.nextTick(function() {
+                        tick(function() {
                             callback();
                         });
                     }
                     return;
                 }
 
-                node.classList.add(cls);
-                alloy.on.once(node, 'transitionend', function() {
-                    node.classList.remove(cls);
+                dom.style(node, {
+                    transition:style,
+                    opacity: 1
+                });
+
+                on.once(node, 'transitionend', function() {
+                    dom.style(node, {
+                        transition:''
+                    });
                     node.style.display = 'none';
                 });
                 handleCallback(node, immediate, callback);
-                alloy.defer.nextTick(function() {
+                tick(function() {
                     node.style.opacity = 0;
                 });
             },
@@ -127,21 +140,28 @@
                     opacity = options.opacity || 1,
                     immediate = options.immediate,
                     callback = options.callback,
-                    cls = 'fadeable';
+                    speed = options.speed || 400,
+                    style = 'all '+speed+'ms ease';
+
                 if (immediate === true || dom.style(node, 'opacity') === opacity) {
                     node.style.opacity = opacity;
                     if (callback) {
-                        alloy.defer.nextTick(function() {
+                        tick(function() {
                             callback();
                         });
                     }
                     return;
                 }
-                node.style.display = 'block';
-                node.style.opacity = 0;
-                node.classList.add(cls);
-                alloy.on.once(node, 'transitionend', function() {
-                    node.classList.remove(cls);
+                dom.style(node, {
+                    transition:style,
+                    opacity: 0,
+                    display: ''
+                });
+
+                on.once(node, 'transitionend', function() {
+                    dom.style(node, {
+                        transition:''
+                    });
                 });
                 handleCallback(node, immediate, callback);
                 setTimeout(function () {
@@ -208,7 +228,7 @@
                     return;
                 }
                 this.isOverlayShowing = false;
-                alloy.on.once(this.overlayNode, 'transitionend', function() {
+                on.once(this.overlayNode, 'transitionend', function() {
                     if (!this.isOverlayShowing) {
                         dom.destroy(this.overlayNode);
                         this.overlayNode = null;

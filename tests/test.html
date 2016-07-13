@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-    <title>Test popup</title>
+    <title>Test fx</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.css">
     <script src="https://rawgit.com/clubajax/dom/master/src/dom.js"></script>
     <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
@@ -9,10 +9,26 @@
     <script src="../src/fx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
+    <style>
+        body{
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .fade-me{
+            border: 1px solid #666;
+            background: #ffb5b7;
+            padding: 10px;
+            display: inline-block;
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>popup test</h1>
+    <h1>fx test</h1>
     <div id="mocha"></div>
+    <div class="fade-me" id="1">
+        This div is for opacity tests
+    </div>
     <script>
 
         mocha.setup('tdd');
@@ -27,14 +43,26 @@
             function xsuite () {}
             function xtest () {}
 
-            xsuite('fx.blah', function () {
-                test('it should ...', function () {
-
+            suite('fx.fade', function () {
+                test('it should fade out', function (done) {
+                    var node = dom.byId('1');
+                    fx.fade.out(node, {
+                        speed: 200,
+                        callback: function () {
+                            console.log('CALLBACK');
+                            expect(dom.style(node, 'opacity')).to.equal('0');
+                            fx.fade.in(node, {
+                                speed: 200,
+                                callback: function () {
+                                    console.log(' > CALLBACK');
+                                    expect(dom.style(node, 'opacity')).to.equal('1');
+                                    done();
+                                }
+                            });
+                        }
+                    });
                 });
-
             });
-
-
         });
 
         mocha.run();
