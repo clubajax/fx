@@ -22,6 +22,16 @@
 
     var fx = {
 
+        wipe: {
+            in: function (node, options) {
+
+            },
+
+            out: function (node, options) {
+
+            }
+        },
+
         collapse: function(node, immediate, callback, targetHeight) {
             if (immediate === true) {
                 node._collapsed = 1;
@@ -95,81 +105,56 @@
             });
         },
 
+        opacity: function (node, options) {
+            options = options || {};
+            var
+                immediate = options.immediate,
+                callback = options.callback,
+                begOpacity = dom.style(node, 'opacity'),
+                endOpacity = options.opacity === undefined ? begOpacity < 0.5 ? 1 : 0 : options.opacity,
+                speed = options.speed || 400,
+                style = 'all '+speed+'ms ease';
+            
+            if (immediate === true || dom.style(node, 'opacity') === endOpacity) {
+                node.style.opacity = endOpacity;
+                if (callback) {
+                    tick(function() {
+                        callback();
+                    });
+                }
+                return;
+            }
+
+            dom.style(node, {
+                transition:style,
+                opacity: begOpacity,
+                display: ''
+            });
+
+            on.once(node, 'transitionend', function() {
+                dom.style(node, {
+                    transition:''
+                });
+                if(endOpacity === 0){
+                    node.style.display = 'none';
+                }
+            });
+            handleCallback(node, immediate, callback);
+            tick(function() {
+                node.style.opacity = endOpacity;
+            });
+        },
+
         fade: {
             out: function(node, options) {
-
                 options = options || {};
-                var
-                    immediate = options.immediate,
-                    callback = options.callback,
-                    begOpacity = dom.style(node, 'opacity'),
-                    opacity = options.opacity || 0,
-                    speed = options.speed || 400,
-                    style = 'all '+speed+'ms ease';
-
-                console.log('OP', dom.style(node, 'opacity'));
-
-                if (immediate === true || dom.style(node, 'opacity') === opacity) {
-                    node.style.opacity = opacity;
-                    if (callback) {
-                        tick(function() {
-                            callback();
-                        });
-                    }
-                    return;
-                }
-
-                dom.style(node, {
-                    transition:style,
-                    opacity: begOpacity
-                });
-
-                on.once(node, 'transitionend', function() {
-                    dom.style(node, {
-                        transition:''
-                    });
-                    node.style.display = 'none';
-                });
-                handleCallback(node, immediate, callback);
-                tick(function() {
-                    node.style.opacity = opacity;
-                });
+                options.opacity = options.opacity || 0;
+                fx.opacity(node, options);
             },
             in: function(node, options) {
-
                 options = options || {};
-                var
-                    begOpacity = dom.style(node, 'opacity'),
-                    opacity = options.opacity || 1,
-                    immediate = options.immediate,
-                    callback = options.callback,
-                    speed = options.speed || 400,
-                    style = 'all '+speed+'ms ease';
-
-                if (immediate === true || dom.style(node, 'opacity') === opacity) {
-                    node.style.opacity = opacity;
-                    if (callback) {
-                        tick(function() {
-                            callback();
-                        });
-                    }
-                    return;
-                }
-                dom.style(node, {
-                    transition:style,
-                    opacity: begOpacity,
-                    display: ''
-                });
-
-                on.once(node, 'transitionend', function() {
-                    dom.style(node, {
-                        transition:''
-                    });
-                });
-                handleCallback(node, immediate, callback);
-                tick(function () {
-                    node.style.opacity = opacity;
-                });
+                options.opacity = options.opacity || 1;
+                fx.opacity(node, options);
             }
         },
 

@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 <head>
-    <title>Test fx</title>
-    <script src="https://rawgit.com/clubajax/dom/master/src/dom.js"></script>
+    <title>demo fx</title>
+    <script src="https://rawgit.com/clubajax/dom/v1.1.0/src/dom.js"></script>
     <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
     <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
     <script src="../src/fx.js"></script>
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-    <h1>fx test</h1>
+    <h1>fx demo</h1>
     <div id="mocha"></div>
     <div class="fade-me" id="1">
         This div is for opacity tests
@@ -29,7 +29,25 @@
     <script>
 
         var node = dom.byId('1');
-        fx.fade.out(node);
+        fx.opacity(node, {
+            opacity: 0,
+            callback: function () {
+                fx.opacity(node, {
+                    opacity: 1,
+                    callback: function () {
+                        console.log('0.2....');
+                        fx.opacity(node, {
+                            opacity: 0.2,
+                            callback: function () {
+                                fx.opacity(node, {
+                                    opacity: 0.7
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
 
     </script>
 </body>

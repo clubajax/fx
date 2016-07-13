@@ -10,5 +10,9 @@
         "node_modules",
         "bower_components"
     ],
-    "main": "src/fx.js"
+    "main": "src/fx.js",
+    "dependencies":{
+        "dom": "clubajax/dom#v1.1.0",
+        "on": "clubajax/on"
+    }
 }

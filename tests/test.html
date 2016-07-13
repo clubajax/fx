@@ -3,7 +3,7 @@
 <head>
     <title>Test fx</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.css">
-    <script src="https://rawgit.com/clubajax/dom/master/src/dom.js"></script>
+    <script src="https://rawgit.com/clubajax/dom/v1.1.0/src/dom.js"></script>
     <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
     <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
     <script src="../src/fx.js"></script>
@@ -43,18 +43,19 @@
 
             function xsuite () {}
             function xtest () {}
-
-            suite('fx.fade', function () {
-                xtest('it should fade out and in', function (done) {
+            suite('fx.opacity', function () {
+                test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
-                    fx.fade.out(node, {
+                    fx.opacity(node, {
+                        opacity: 0,
                         speed: 200,
                         callback: function () {
-                            expect(dom.style(node, 'opacity')).to.equal('0');
-                            fx.fade.in(node, {
+                            expect(dom.style(node, 'opacity')).to.equal(0);
+                            fx.opacity(node, {
+                                opacity: 1,
                                 speed: 200,
                                 callback: function () {
-                                    expect(dom.style(node, 'opacity')).to.equal('1');
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
                                     done();
                                 }
                             });
@@ -62,16 +63,73 @@
                     });
                 });
 
-                xtest('it should fade out and in immediately', function (done) {
+                test('it should use opacity to fade out and in immediately', function (done) {
+                    var node = dom.byId('1');
+                    fx.opacity(node, {
+                        opacity: 0,
+                        immediate: true,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0);
+                            fx.opacity(node, {
+                                opacity: 1,
+                                immediate: true,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should use opacity to fade out to 0.2 and back in', function (done) {
+                    var node = dom.byId('1');
+                    fx.opacity(node, {
+                        speed: 200,
+                        opacity: 0.2,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0.2);
+                            fx.opacity(node, {
+                                speed: 200,
+                                opacity: 0.7,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(0.7);
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
+            xsuite('fx.fade', function () {
+                test('it should fade out and in', function (done) {
+                    var node = dom.byId('1');
+                    fx.fade.out(node, {
+                        speed: 200,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0);
+                            fx.fade.in(node, {
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should fade out and in immediately', function (done) {
                     var node = dom.byId('1');
                     fx.fade.out(node, {
                         immediate: true,
                         callback: function () {
-                            expect(dom.style(node, 'opacity')).to.equal('0');
+                            expect(dom.style(node, 'opacity')).to.equal(0);
                             fx.fade.in(node, {
                                 immediate: true,
                                 callback: function () {
-                                    expect(dom.style(node, 'opacity')).to.equal('1');
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
                                     done();
                                 }
                             });
@@ -82,20 +140,26 @@
                 test('it should fade out to 0.5 and back in', function (done) {
                     var node = dom.byId('1');
                     fx.fade.out(node, {
-                        speed: 600,
+                        speed: 200,
                         opacity: 0.2,
                         callback: function () {
-                            expect(dom.style(node, 'opacity')).to.equal('0.2');
+                            expect(dom.style(node, 'opacity')).to.equal(0.2);
                             fx.fade.in(node, {
-                                speed: 600,
+                                speed: 200,
                                 opacity: 0.7,
                                 callback: function () {
-                                    expect(dom.style(node, 'opacity')).to.equal('0.7');
+                                    expect(dom.style(node, 'opacity')).to.equal(0.7);
                                     done();
                                 }
                             });
                         }
                     });
+                });
+            });
+
+            xsuite('fx.wipe', function () {
+                test('it should collapse', function (done) {
+
                 });
             });
         });
