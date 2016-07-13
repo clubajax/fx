@@ -98,17 +98,19 @@
         fade: {
             out: function(node, options) {
 
-                console.log('OUT');
                 options = options || {};
                 var
                     immediate = options.immediate,
                     callback = options.callback,
+                    begOpacity = dom.style(node, 'opacity'),
+                    opacity = options.opacity || 0,
                     speed = options.speed || 400,
                     style = 'all '+speed+'ms ease';
 
+                console.log('OP', dom.style(node, 'opacity'));
 
-                if (immediate === true || dom.style(node, 'opacity') === 0) {
-                    node.style.opacity = 0;
+                if (immediate === true || dom.style(node, 'opacity') === opacity) {
+                    node.style.opacity = opacity;
                     if (callback) {
                         tick(function() {
                             callback();
@@ -119,7 +121,7 @@
 
                 dom.style(node, {
                     transition:style,
-                    opacity: 1
+                    opacity: begOpacity
                 });
 
                 on.once(node, 'transitionend', function() {
@@ -130,13 +132,14 @@
                 });
                 handleCallback(node, immediate, callback);
                 tick(function() {
-                    node.style.opacity = 0;
+                    node.style.opacity = opacity;
                 });
             },
             in: function(node, options) {
 
                 options = options || {};
                 var
+                    begOpacity = dom.style(node, 'opacity'),
                     opacity = options.opacity || 1,
                     immediate = options.immediate,
                     callback = options.callback,
@@ -154,7 +157,7 @@
                 }
                 dom.style(node, {
                     transition:style,
-                    opacity: 0,
+                    opacity: begOpacity,
                     display: ''
                 });
 
@@ -164,9 +167,9 @@
                     });
                 });
                 handleCallback(node, immediate, callback);
-                setTimeout(function () {
+                tick(function () {
                     node.style.opacity = opacity;
-                }, 100);
+                });
             }
         },
 

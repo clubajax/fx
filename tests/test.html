@@ -36,6 +36,7 @@
         suite('fx', function() {
 
             var suite = window.suite,
+                test = window.test,
                 dom = window.dom,
                 on = window.on,
                 expect = chai.expect;
@@ -44,18 +45,52 @@
             function xtest () {}
 
             suite('fx.fade', function () {
-                test('it should fade out', function (done) {
+                xtest('it should fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.fade.out(node, {
                         speed: 200,
                         callback: function () {
-                            console.log('CALLBACK');
                             expect(dom.style(node, 'opacity')).to.equal('0');
                             fx.fade.in(node, {
                                 speed: 200,
                                 callback: function () {
-                                    console.log(' > CALLBACK');
                                     expect(dom.style(node, 'opacity')).to.equal('1');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                xtest('it should fade out and in immediately', function (done) {
+                    var node = dom.byId('1');
+                    fx.fade.out(node, {
+                        immediate: true,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal('0');
+                            fx.fade.in(node, {
+                                immediate: true,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal('1');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should fade out to 0.5 and back in', function (done) {
+                    var node = dom.byId('1');
+                    fx.fade.out(node, {
+                        speed: 600,
+                        opacity: 0.2,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal('0.2');
+                            fx.fade.in(node, {
+                                speed: 600,
+                                opacity: 0.7,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal('0.7');
                                     done();
                                 }
                             });
