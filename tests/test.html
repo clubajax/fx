@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <title>Test popup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.css">
+    <script src="https://rawgit.com/clubajax/dom/master/src/dom.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
+    <script src="../src/fx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
+</head>
+<body>
+    <h1>popup test</h1>
+    <div id="mocha"></div>
+    <script>
+
+        mocha.setup('tdd');
+
+        suite('fx', function() {
+
+            var suite = window.suite,
+                dom = window.dom,
+                on = window.on,
+                expect = chai.expect;
+
+            function xsuite () {}
+            function xtest () {}
+
+            xsuite('fx.blah', function () {
+                test('it should ...', function () {
+
+                });
+
+            });
+
+
+        });
+
+        mocha.run();
+    </script>
+</body>
+</html>

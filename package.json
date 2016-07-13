@@ -1,0 +1,17 @@
+{
+	"author": "Mike Wilcox @clubajax",
+	"name": "fx",
+	"main":"src/fx.js",
+	"description": "A utility for node animations",
+	"version": "0.8.0",
+	"license": "MIT",
+    "readmeFilename": "README.md",
+	"repository": {
+        "type": "git",
+        "url": "git://github.com/clubajax/fx.git"
+    },
+	"dependencies": {
+		"dom": "clubajax/dom#v1.1.0",
+		"on": "clubajax/on"
+	}
+}

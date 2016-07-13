@@ -1,0 +1,14 @@
+{
+    "name": "popup",
+    "version": "0.8.0",
+    "authors": [
+        "Mike Wilcox <anm9tr@gmail.com>"
+    ],
+    "description": "A utility for node animations",
+    "license": "MIT",
+    "ignore": [
+        "node_modules",
+        "bower_components"
+    ],
+    "main": "src/fx.js"
+}
