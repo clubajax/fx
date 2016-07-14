@@ -36,7 +36,7 @@
                 speed = options.speed || 200,
                 transition = 'all '+speed+'ms ease';
 
-            console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
+            //console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
             //console.log('sizes', sizes);
 
             if(immediate || styledHeight === endHeight){
@@ -108,7 +108,7 @@
                 speed = options.speed || 400,
                 style = 'all '+speed+'ms ease';
 
-            if (immediate === true || dom.style(node, 'opacity') === endOpacity) {
+            if (immediate === true || begOpacity === endOpacity) {
                 node.style.opacity = endOpacity;
                 if(endOpacity === 0){
                     node.style.display = 'none';
