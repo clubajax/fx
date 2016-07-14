@@ -3,9 +3,9 @@
 <head>
     <title>Test fx</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.css">
-    <script src="https://rawgit.com/clubajax/dom/v1.1.0/src/dom.js"></script>
-    <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
-    <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
+    <script src="../bower_components/dom/src/dom.js"></script>
+    <script src="../bower_components/on/src/key-poly.js"></script>
+    <script src="../bower_components/on/src/on.js"></script>
     <script src="../src/fx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
@@ -44,7 +44,7 @@
 
             function xsuite () {}
             function xtest () {}
-            xsuite('fx.opacity', function () {
+            suite('fx.opacity', function () {
                 test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.opacity(node, {
@@ -103,7 +103,7 @@
                 });
             });
 
-            xsuite('fx.fade', function () {
+            suite('fx.fade', function () {
                 test('it should fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.fade.out(node, {
@@ -158,8 +158,8 @@
                 });
             });
 
-            xsuite('fx.height', function () {
-                xtest('it should collapse and expand', function (done) {
+            suite('fx.height', function () {
+                test('it should collapse and expand', function (done) {
                     var node = dom.byId('1');
                     fx.height(node, {
                         height: 0,
@@ -188,7 +188,7 @@
                     });
                 });
 
-                xtest('it should collapse and expand without border-box styling', function (done) {
+                test('it should collapse and expand without border-box styling', function (done) {
                     var node = dom.byId('1');
                     node.style.boxSizing = 'content-box';
                     fx.height(node, {
@@ -209,6 +209,7 @@
                                         callback: function () {
                                             expect(dom.box(node).height).to.equal(40);
                                             expect(node.style.paddingTop).to.equal('10px');
+                                            node.style.boxSizing = '';
                                             done();
                                         }
                                     });
@@ -218,7 +219,7 @@
                     });
                 });
 
-                xtest('it should collapse and expand immediately', function (done) {
+                test('it should collapse and expand immediately', function (done) {
                     var node = dom.byId('1');
                     fx.height(node, {
                         height: 0,
@@ -306,6 +307,7 @@
         });
 
         mocha.run();
+
     </script>
 </body>
 </html>

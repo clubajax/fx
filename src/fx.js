@@ -208,38 +208,6 @@
             out: function () {
                 throw new Error('fx.zoom.out is not implemented');
             }
-        },
-
-        overlay: {
-            show: function() {
-                if (this.isOverlayShowing) {
-                    return;
-                }
-                this.isOverlayShowing = true;
-                this.overlayNode = this.overlayNode || dom('div', {
-                        className: 'ay-overlay'
-                    }, document.body);
-                alloy.defer.nextTick(function() {
-                    this.overlayNode.classList.add('show');
-                }.bind(this));
-                return this.overlayNode;
-            },
-            hide: function() {
-                if (!this.isOverlayShowing) {
-                    return;
-                }
-                this.isOverlayShowing = false;
-                on.once(this.overlayNode, 'transitionend', function() {
-                    if (!this.isOverlayShowing) {
-                        dom.destroy(this.overlayNode);
-                        this.overlayNode = null;
-                    } else {
-                        // it was reopened while we were closing
-                        this.overlayNode.classList.add('show');
-                    }
-                }.bind(this));
-                this.overlayNode.classList.remove('show');
-            }
         }
     };
 
