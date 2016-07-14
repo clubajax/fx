@@ -30,7 +30,7 @@
                 immediate = options.immediate || false,
                 sizes = getSizes(node),
                 actualHeight = sizes.height,
-                begHeight = sizes.height,
+                begHeight = options.startHeight || sizes.height,
                 endHeight = options.height || 0,
                 styledHeight = dom.style(node, 'height'),
                 speed = options.speed || 200,
