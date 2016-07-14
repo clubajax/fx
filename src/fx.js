@@ -32,14 +32,25 @@
                 actualHeight = sizes.height,
                 begHeight = sizes.height,
                 endHeight = options.height || 0,
+                styledHeight = dom.style(node, 'height'),
                 speed = options.speed || 200,
                 transition = 'all '+speed+'ms ease';
 
-            //console.log('begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
+            console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
             //console.log('sizes', sizes);
 
-            if(immediate){
-
+            if(immediate || styledHeight === endHeight){
+                dom.style(node, {
+                    transition: '',
+                    height: endHeight === 'auto' ? '' : endHeight + 'px',
+                    display: !!endHeight ? '' : 'none',
+                    paddingTop: endHeight ? sizes.padTop + 'px' : 0,
+                    paddingBottom: endHeight ? sizes.padBot + 'px' : 0
+                });
+                if(callback){
+                    tick(callback);
+                }
+                return;
             }
 
             if(endHeight === 'auto' && sizes.boxSizing === 'border-box'){
@@ -54,12 +65,10 @@
             });
 
             on.once(node, 'transitionend', function() {
-                var hProp = endHeight === 'auto' ? '' : endHeight + 'px',
-                    dProp = !!endHeight ? '' : 'none';
                 dom.style(node, {
                     transition: '',
-                    height: hProp,
-                    display: dProp
+                    height: endHeight === 'auto' ? '' : endHeight + 'px',
+                    display: !!endHeight ? '' : 'none'
                 });
             });
             handleCallback(node, immediate, callback, 'collapse');
@@ -277,7 +286,6 @@
             paddingBottom: prevPadBot
         });
 
-        console.log('box.height padTop padBot', box.height, padTop, padBot);
         box.height = box.height - padTop - padBot;
         box.padTop = padTop;
         box.padBot = padBot;

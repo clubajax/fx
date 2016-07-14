@@ -188,7 +188,7 @@
                     });
                 });
 
-                test('it should collapse and expand without border-box styling', function (done) {
+                xtest('it should collapse and expand without border-box styling', function (done) {
                     var node = dom.byId('1');
                     node.style.boxSizing = 'content-box';
                     fx.height(node, {
@@ -212,6 +212,56 @@
                                             done();
                                         }
                                     });
+                                }
+                            });
+                        }
+                    });
+                });
+
+                xtest('it should collapse and expand immediately', function (done) {
+                    var node = dom.byId('1');
+                    fx.height(node, {
+                        height: 0,
+                        immediate: true,
+                        callback: function () {
+                            expect(node.style.height).to.equal('0px');
+                            expect(node.style.paddingTop).to.equal('0px');
+                            fx.height(node, {
+                                height: 100,
+                                immediate: true,
+                                callback: function () {
+                                    expect(dom.box(node).height).to.equal(100);
+                                    expect(node.style.paddingTop).to.equal('10px');
+                                    fx.height(node, {
+                                        height: 'auto',
+                                        immediate: true,
+                                        callback: function () {
+                                            expect(dom.box(node).height).to.equal(40);
+                                            expect(node.style.paddingTop).to.equal('10px');
+                                            done();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should still callback if start and end height are the same', function (done) {
+                    var node = dom.byId('1');
+                    fx.height(node, {
+                        height: 100,
+                        speed: 100,
+                        callback: function () {
+                            expect(node.style.height).to.equal('100px');
+                            expect(node.style.paddingTop).to.equal('10px');
+                            fx.height(node, {
+                                height: 100,
+                                speed: 100,
+                                callback: function () {
+                                    expect(dom.box(node).height).to.equal(100);
+                                    expect(node.style.paddingTop).to.equal('10px');
+                                    done();
                                 }
                             });
                         }
