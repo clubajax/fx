@@ -10,8 +10,8 @@
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
         if (cb && immediate !== true) {
             on.once(node, 'transitionend', function() {
-                //setTimeout(cb, 500);
-                cb();
+                setTimeout(cb, 500);
+                //cb();
             });
         }
     }
@@ -23,7 +23,50 @@
     var fx = {
 
         height: function (node, options) {
+            var
+                callback = options.callback,
+                immediate = options.immediate || false,
+                sizes = getSizes(node),
+                actualHeight = sizes.height,
+                begHeight = sizes.height,
+                endHeight = options.height || 0,
+                speed = options.speed || 200,
+                transition = 'all '+speed+'ms ease';
 
+            console.log('begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
+            console.log('sizes', sizes);
+
+            if(endHeight === 'auto' && sizes.boxSizing === 'border-box'){
+                console.log('AUTO', endHeight);
+                endHeight += sizes.padBot + sizes.padTop;
+                endHeight = actualHeight + sizes.padBot + sizes.padTop;
+                console.log('AUTO.new', endHeight);
+            }
+
+            dom.style(node, {
+                overflow: 'hidden',
+                transition: transition,
+                height: begHeight,
+                display: ''
+            });
+
+            on.once(node, 'transitionend', function() {
+                var hProp = endHeight === 'auto' ? '' : endHeight + 'px',
+                    dProp = !!endHeight ? '' : 'none';
+                dom.style(node, {
+                    transition: '',
+                    height: hProp,
+                    display: dProp
+                });
+            });
+            handleCallback(node, immediate, callback, 'collapse');
+            // tick does not work here for some reason
+            setTimeout(function() {
+                node.style.height = endHeight ? endHeight + 'px' : '0';
+                node.style.paddingTop = endHeight ? sizes.padTop + 'px' : 0;
+                node.style.paddingBottom = endHeight ? sizes.padBot + 'px' : 0;
+                console.log('node.style.height', node.style.height);
+            },1);
         },
 
         collapse: function(node, immediate, callback, targetHeight) {
@@ -43,11 +86,10 @@
             }
 
 
-
             var
                 sizes = getSizes(node),
                 height = sizes.height,
-                speed = 1500,
+                speed = 500,
                 transition = 'all '+speed+'ms ease';
 
             node.style.height  = '';
@@ -59,14 +101,13 @@
             });
 
             on.once(node, 'transitionend', function() {
-                console.log('transitionend');
+                var hProp = !!targetHeight ? '' : 0,
+                    dProp = !!targetHeight ? '' : 'none';
                 dom.style(node, {
-                    transition: ''
+                    transition: '',
+                    height: hProp,
+                    display: dProp
                 });
-                if (!targetHeight) {
-                    node.style.display = 'none';
-                    //node.style.height  = '';
-                }
             });
             handleCallback(node, immediate, callback, 'collapse');
             // tick does not work here for some reason
@@ -269,22 +310,40 @@
         var
             box,
             height,
+            padTop,
+            padBot,
+            boxSizing = dom.style(node, 'box-sizing'),
+            prevPadTop = dom.style(node, 'paddingTop'),
+            prevPadBot = dom.style(node, 'paddingBottom'),
             previousDisplay = node.style.display,
-            previousHeight = dom.style(node, 'height'),
-            padTop = dom.style(node, 'paddingTop'),
-            padBot = dom.style(node, 'paddingBottom');
+            previousHeight = dom.style(node, 'height');
 
         node.style.height = '';
         node.style.display = '';
 
+        dom.style(node, {
+            height: '',
+            display: '',
+            paddingTop: '',
+            paddingBottom: ''
+        });
+
         box = dom.box(node);
+        padTop = parseInt(dom.style(node, 'paddingTop'), 10);
+        padBot = parseInt(dom.style(node, 'paddingBottom'), 10);
 
         dom.style(node, {
             height: previousHeight,
-            display: previousDisplay
+            display: previousDisplay,
+            paddingTop: prevPadTop,
+            paddingBottom: prevPadBot
         });
 
+        console.log('box.height padTop padBot', box.height, padTop, padBot);
         box.height = box.height - padTop - padBot;
+        box.padTop = padTop;
+        box.padBot = padBot;
+        box.boxSizing = boxSizing;
 
         return box;
 

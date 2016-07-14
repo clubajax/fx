@@ -20,6 +20,7 @@
             padding: 10px;
             display: inline-block;
             margin: 20px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -157,9 +158,64 @@
                 });
             });
 
-            xsuite('fx.height', function () {
-                test('it should collapse', function (done) {
+            suite('fx.height', function () {
+                xtest('it should collapse and expand', function (done) {
+                    var node = dom.byId('1');
+                    fx.height(node, {
+                        height: 0,
+                        speed: 100,
+                        callback: function () {
+                            expect(node.style.height).to.equal('0px');
+                            expect(node.style.paddingTop).to.equal('0px');
+                            fx.height(node, {
+                                height: 100,
+                                speed: 100,
+                                callback: function () {
+                                    expect(dom.box(node).height).to.equal(100);
+                                    expect(node.style.paddingTop).to.equal('10px');
+                                    fx.height(node, {
+                                        height: 'auto',
+                                        speed: 100,
+                                        callback: function () {
+                                            expect(dom.box(node).height).to.equal(40);
+                                            expect(node.style.paddingTop).to.equal('10px');
+                                            done();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
 
+                test('it should collapse and expand without border-box styling', function (done) {
+                    var node = dom.byId('1');
+                    node.style.boxSizing = 'content-box';
+                    fx.height(node, {
+                        height: 0,
+                        speed: 100,
+                        callback: function () {
+                            expect(node.style.height).to.equal('0px');
+                            expect(node.style.paddingTop).to.equal('0px');
+                            fx.height(node, {
+                                height: 100,
+                                speed: 100,
+                                callback: function () {
+                                    expect(dom.box(node).height).to.equal(122);
+                                    expect(node.style.paddingTop).to.equal('10px');
+                                    fx.height(node, {
+                                        height: 'auto',
+                                        speed: 100,
+                                        callback: function () {
+                                            expect(dom.box(node).height).to.equal(40);
+                                            expect(node.style.paddingTop).to.equal('10px');
+                                            done();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
             });
         });

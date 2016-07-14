@@ -18,6 +18,9 @@
             display: inline-block;
             margin: 20px;
         }
+        .fade-me{
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +56,20 @@
         }
 
         function height () {
-            fx.collapse(node);
+            fx.height(node, {
+                height: 0,
+                callback: function () {
+                    fx.height(node, {
+                        height: 100,
+                        callback: function () {
+                            fx.height(node, {
+                                speed: 1000,
+                                height: 'auto'
+                            });
+                        }
+                    });
+                }
+            });
         }
         setTimeout(height, 700);
 
