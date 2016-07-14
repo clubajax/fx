@@ -28,7 +28,7 @@
     <h1>fx test</h1>
     <div id="mocha"></div>
     <div class="fade-me" id="1">
-        This div is for opacity tests
+        This div is for tests
     </div>
     <script>
 
@@ -158,7 +158,7 @@
                 });
             });
 
-            suite('fx.height', function () {
+            xsuite('fx.height', function () {
                 xtest('it should collapse and expand', function (done) {
                     var node = dom.byId('1');
                     fx.height(node, {
@@ -262,6 +262,41 @@
                                     expect(dom.box(node).height).to.equal(100);
                                     expect(node.style.paddingTop).to.equal('10px');
                                     done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
+            suite('fx.scale', function () {
+                this.timeout(5000);
+                test('it should zoom in and out', function (done) {
+                    var node = dom.byId('1'),
+                        size = dom.box(node);
+
+                    fx.scale(node, {
+                        scale: 2,
+                        callback: function () {
+                            var final = dom.box(node);
+                            expect(final.width > size.width).to.equal(true);
+                            fx.scale(node, {
+                                scale: 0.1,
+                                opacity: 0,
+                                callback: function () {
+                                    var final = dom.box(node);
+                                    expect(final.width < size.width).to.equal(true);
+                                    expect(dom.style(node, 'opacity')).to.equal(0);
+                                    fx.scale(node, {
+                                        scale: 1,
+                                        opacity: 1,
+                                        callback: function () {
+                                            var final = dom.box(node);
+                                            expect(final.width === size.width).to.equal(true);
+                                            expect(dom.style(node, 'opacity')).to.equal(1);
+                                            done();
+                                        }
+                                    });
                                 }
                             });
                         }

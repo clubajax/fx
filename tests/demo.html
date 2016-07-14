@@ -71,7 +71,34 @@
                 }
             });
         }
-        setTimeout(height, 700);
+        //setTimeout(height, 100);
+
+        function scale () {
+            fx.scale(node, {
+                scale: 2,
+                speed: 700,
+                delay: 200,
+                callback: function () {
+                    fx.scale(node, {
+                        scale: 0.1,
+                        endOpacity: 0,
+                        speed: 700,
+                        delay: 1200,
+                        callback: function () {
+
+                            fx.scale(node, {
+                                scale: 1,
+                                startOpacity: 0,
+                                endOpacity: 1,
+                                speed: 700,
+                                delay: 200
+                            })
+                        }
+                    })
+                }
+            });
+        }
+        scale();
 
     </script>
 </body>

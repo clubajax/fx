@@ -97,6 +97,8 @@
         },
 
         opacity: function (node, options) {
+            // TODO: make opacity:0 + display:none optional with options.display
+
             options = options || {};
             var
                 immediate = options.immediate,
@@ -152,42 +154,59 @@
             }
         },
 
+        scale: function (node, options) {
+
+            var
+                startOpacity = options.startOpacity === undefined ? 1 : options.startOpacity,
+                endOpacity = options.opacity === undefined ? 1 : options.opacity,
+                startScale = getScale(options, node),
+                endScale = options.scale === undefined ? 1 : options.scale,
+                speed = options.speed || 150,
+                delay = options.delay || 1,
+                orgPosition = node.style.position;
+
+            dom.style(node, {
+                position: 'absolute',
+                opacity: startOpacity,
+                transform: 'scaleX('+startScale+') scaleY('+startScale+')'
+            });
+
+            handleCallback(node, false, options.callback);
+
+            on.once(node, 'transitionend', function() {
+                dom.style(node, {
+                    position: orgPosition,
+                    transition: ''
+                });
+            });
+
+            setTimeout(function () {
+                dom.style(node, {
+                    transition: 'transform '+speed+'ms ease-in, opacity '+speed+'ms ease-in 50ms'
+                });
+                tick(function() {
+                    dom.style(node, {
+                        opacity: endOpacity,
+                        transform: 'scaleX('+endScale+') scaleY('+endScale+')'
+                    });
+                });
+            }, delay);
+        },
+
         zoom: {
             in: function (node, options) {
-                options = options || {};
-
-                var
-                    startopacity = options.startOpacity || 0,
-                    startScale = options.startScale || .2,
-                    endOpacity = options.endOpacity || 1,
-                    endScale = options.endScale || 1,
-                    speed = options.speed || 150,
-                    startDelay = options.delay || 20,
-                    display = options.display || 'block';
-
-                dom.style(node, {
-                    display: display,
-                    opacity: startopacity,
-                    transform: alloy.tmpl('scaleX(${scale}) scaleY(${scale})', {scale: startScale})
-                });
-
-                handleCallback(node, false, options.callback);
-
-                setTimeout(function () {
-                    dom.style(node, {
-                        transition: alloy.tmpl('transform ${speed}ms ease-in, opacity ${speed}ms ease-in 50ms', {speed: speed})
-                    });
-                    alloy.defer.nextTick(function() {
-                        dom.style(node, {
-                            opacity: endOpacity,
-                            transform: alloy.tmpl('scaleX(${scale}) scaleY(${scale})', {scale: endScale})
-                        });
-                    });
-                }, startDelay);
+                var defaults = {
+                    opacity: 0,
+                    startScale: 0.2,
+                    scale: 1,
+                    speed: options.speed || 200,
+                    delay: options.startDelay || 1
+                };
+                fx.scale(node, defaults);
             },
 
             out: function () {
-                throw new Error('alloy.fx.zoom.out is not implemented');
+                throw new Error('fx.zoom.out is not implemented');
             }
         },
 
@@ -224,33 +243,17 @@
         }
     };
 
-    function getContentHeight (node) {
-        if (!node) {
-            return 0;
+    function getScale (options, node) {
+        if(options.startScale !== undefined){
+            return options.startScale;
         }
-
-        var
-            height,
-            previousDisplay,
-            previousHeight = node.style.height,
-            previousHeightInPx = parseInt(previousHeight, 10);
-
-        if (previousHeightInPx > 0) {
-            return previousHeightInPx;
-        }
-
-        previousDisplay = node.style.display;
-
-        node.style.height = '';
-        node.style.display = '';
-
-        // are we ever animating window??
-        height = node === window ? node.innerHeight : node.getBoundingClientRect().height;
-
-        node.style.height = previousHeight;
-        node.style.display = previousDisplay;
-
-        return height;
+        var num, r, trans = node.style.transform;
+        if(!trans){ return 1; }
+        r = /\d*\d\.*\d*/.exec(trans);
+        if(!r){ return null; }
+        num = parseInt(r[0], 0);
+        if(isNaN(num)){ return 1; }
+        return num;
     }
 
     function getSizes (node) {
