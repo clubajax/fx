@@ -16,6 +16,8 @@
         }
     }
 
+    // TODO: a special function for handling multiple animations with a single transitionend
+
     function tick (callback) {
         window.requestAnimationFrame(callback);
     }
@@ -33,14 +35,15 @@
                 speed = options.speed || 200,
                 transition = 'all '+speed+'ms ease';
 
-            console.log('begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
-            console.log('sizes', sizes);
+            //console.log('begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
+            //console.log('sizes', sizes);
+
+            if(immediate){
+
+            }
 
             if(endHeight === 'auto' && sizes.boxSizing === 'border-box'){
-                console.log('AUTO', endHeight);
-                endHeight += sizes.padBot + sizes.padTop;
                 endHeight = actualHeight + sizes.padBot + sizes.padTop;
-                console.log('AUTO.new', endHeight);
             }
 
             dom.style(node, {
@@ -65,90 +68,22 @@
                 node.style.height = endHeight ? endHeight + 'px' : '0';
                 node.style.paddingTop = endHeight ? sizes.padTop + 'px' : 0;
                 node.style.paddingBottom = endHeight ? sizes.padBot + 'px' : 0;
-                console.log('node.style.height', node.style.height);
             },1);
         },
 
-        collapse: function(node, immediate, callback, targetHeight) {
-            if (immediate === true) {
-                node._collapsed = 1;
-                if (targetHeight) {
-                    node.style.display = '';
-                    node.style.height  = targetHeight + 'px';
-                } else {
-                    node.style.display = 'none';
-                    node.style.height  = '';
-                }
-                if (callback) {
-                    callback();
-                }
-                return;
-            }
-
-
-            var
-                sizes = getSizes(node),
-                height = sizes.height,
-                speed = 500,
-                transition = 'all '+speed+'ms ease';
-
-            node.style.height  = '';
-
-            node.style.height = height + 'px';
-            dom.style(node, {
-                overflow: 'hidden',
-                transition: transition
+        collapse: function(node, immediate, callback, height) {
+            fx.height(node, {
+                immediate: immediate,
+                callback: callback,
+                height: 0
             });
-
-            on.once(node, 'transitionend', function() {
-                var hProp = !!targetHeight ? '' : 0,
-                    dProp = !!targetHeight ? '' : 'none';
-                dom.style(node, {
-                    transition: '',
-                    height: hProp,
-                    display: dProp
-                });
-            });
-            handleCallback(node, immediate, callback, 'collapse');
-            // tick does not work here for some reason
-            setTimeout(function() {
-                node.style.height = targetHeight ? targetHeight + 'px' : '0';
-                node.style.paddingTop = 0;
-                node.style.paddingBottom = 0;
-            },1);
         },
 
-        expand: function(node, immediate, callback, startHeight) {
-            if (immediate === true) {
-                node._collapsed = 0;
-                node.style.display = '';
-                node.style.height  = '';
-                if (callback) {
-                    callback();
-                }
-                return;
-            }
-
-            node.style.height  = '';
-
-            var
-                cls = 'transition-height',
-                height = this.getContentHeight(node);
-
-            node._collapsed = 0;
-            node.style.height = startHeight ? startHeight + 'px': '0';
-            node.classList.add(cls);
-            node.style.display = '';
-
-            on.once(node, 'transitionend', function() {
-                if (node._collapsed == 0) {
-                    node.classList.remove(cls);
-                    node.style.height = '';
-                }
-            });
-            handleCallback(node, immediate, callback, 'expand');
-            alloy.defer.nextTick(function() {
-                node.style.height = height ? height + 'px' : '0';
+        expand: function(node, immediate, callback) {
+            fx.height(node, {
+                immediate: immediate,
+                callback: callback,
+                height: 'auto'
             });
         },
 
@@ -164,6 +99,9 @@
 
             if (immediate === true || dom.style(node, 'opacity') === endOpacity) {
                 node.style.opacity = endOpacity;
+                if(endOpacity === 0){
+                    node.style.display = 'none';
+                }
                 if (callback) {
                     tick(function() {
                         callback();
