@@ -103,7 +103,7 @@
             var
                 immediate = options.immediate,
                 callback = options.callback,
-                begOpacity = dom.style(node, 'opacity'),
+                begOpacity = options.startOpacity === undefined ? dom.style(node, 'opacity') : options.startOpacity,
                 endOpacity = options.opacity === undefined ? begOpacity < 0.5 ? 1 : 0 : options.opacity,
                 speed = options.speed || 400,
                 style = 'all '+speed+'ms ease';
