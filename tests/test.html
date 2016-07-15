@@ -14,28 +14,36 @@
             padding: 20px;
             font-family: sans-serif;
         }
-        .fade-me{
+        .box{
             border: 1px solid #666;
             background: #ffb5b7;
             padding: 10px;
             display: inline-block;
             margin: 20px;
+        }
+        .b-box{
             box-sizing: border-box;
+        }
+        .c-box{
+            background: #fffab7;
         }
     </style>
 </head>
 <body>
     <h1>fx test</h1>
     <div id="mocha"></div>
-    <div class="fade-me" id="1">
-        This div is for tests
+    <div class="box b-box" id="1">
+        This div is border-box
+    </div>
+    <div class="box c-box" id="2">
+        This div is content-box
     </div>
     <script>
 
         mocha.setup('tdd');
 
         suite('fx', function() {
-
+            this.timeout(3000);
             var suite = window.suite,
                 test = window.test,
                 dom = window.dom,
@@ -44,7 +52,7 @@
 
             function xsuite () {}
             function xtest () {}
-            suite('fx.opacity', function () {
+            xsuite('fx.opacity', function () {
                 test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.opacity(node, {
@@ -103,7 +111,7 @@
                 });
             });
 
-            suite('fx.fade', function () {
+            xsuite('fx.fade', function () {
                 test('it should fade out and in', function (done) {
                     var node = dom.byId('1');
                     fx.fade.out(node, {
@@ -189,8 +197,7 @@
                 });
 
                 test('it should collapse and expand without border-box styling', function (done) {
-                    var node = dom.byId('1');
-                    node.style.boxSizing = 'content-box';
+                    var node = dom.byId('2');
                     fx.height(node, {
                         height: 0,
                         speed: 100,
@@ -268,10 +275,38 @@
                         }
                     });
                 });
+
+                test('it should start at `zero` and end with `auto`', function (done) {
+                    var node = dom.byId('1');
+                    fx.height(node, {
+                        height: 'auto',
+                        startHeight: 0,
+                        speed: 700,
+                        callback: function () {
+                            expect(node.style.height).to.equal('');
+                            expect(node.style.paddingTop).to.equal('10px');
+                            done();
+                        }
+                    });
+                });
+
+                test('it should start at `zero` and end with `auto` with content-box', function (done) {
+                    var node = dom.byId('2');
+                    fx.height(node, {
+                        height: 'auto',
+                        startHeight: 0,
+                        speed: 700,
+                        callback: function () {
+                            expect(node.style.height).to.equal('');
+                            expect(node.style.paddingTop).to.equal('10px');
+                            done();
+                        }
+                    });
+                });
             });
 
-            suite('fx.scale', function () {
-                this.timeout(5000);
+            xsuite('fx.scale', function () {
+
                 test('it should zoom in and out', function (done) {
                     var node = dom.byId('1'),
                         size = dom.box(node);

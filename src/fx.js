@@ -30,19 +30,28 @@
                 immediate = options.immediate || false,
                 sizes = getSizes(node),
                 actualHeight = sizes.height,
-                begHeight = options.startHeight || sizes.height,
-                endHeight = options.height || 0,
                 styledHeight = dom.style(node, 'height'),
+                begHeight = options.startHeight !== undefined ? options.startHeight : styledHeight,
+                endHeight = options.height || 0,
                 speed = options.speed || 200,
-                transition = 'all '+speed+'ms ease';
+                transition = 'all '+speed+'ms ease',
+                hasBeg = options.startHeight !== undefined,
+                isAuto = endHeight === 'auto';
+
+            if(endHeight === 'auto' && sizes.boxSizing === 'border-box'){
+                endHeight = actualHeight + sizes.padBot + sizes.padTop;
+            }
+            else if(endHeight === 'auto'){
+                endHeight = actualHeight;
+            }
 
             //console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
             //console.log('sizes', sizes);
 
-            if(immediate || styledHeight === endHeight){
+            if(immediate || (styledHeight === endHeight && !hasBeg) || begHeight === endHeight){
                 dom.style(node, {
                     transition: '',
-                    height: endHeight === 'auto' ? '' : endHeight + 'px',
+                    height: isAuto ? '' : endHeight + 'px',
                     display: !!endHeight ? '' : 'none',
                     paddingTop: endHeight ? sizes.padTop + 'px' : 0,
                     paddingBottom: endHeight ? sizes.padBot + 'px' : 0
@@ -53,31 +62,35 @@
                 return;
             }
 
-            if(endHeight === 'auto' && sizes.boxSizing === 'border-box'){
-                endHeight = actualHeight + sizes.padBot + sizes.padTop;
-            }
-
             dom.style(node, {
                 overflow: 'hidden',
-                transition: transition,
                 height: begHeight,
-                display: ''
+                display: '',
+                paddingTop: begHeight === 0 ? 0 : sizes.padTop + 'px',
+                paddingBottom: begHeight === 0 ? 0 : sizes.padBot + 'px'
             });
+
+            //if(hasBeg) debugger
 
             on.once(node, 'transitionend', function() {
                 dom.style(node, {
                     transition: '',
-                    height: endHeight === 'auto' ? '' : endHeight + 'px',
+                    height: isAuto ? '' : endHeight + 'px',
                     display: !!endHeight ? '' : 'none'
                 });
             });
             handleCallback(node, immediate, callback, 'collapse');
+
             // tick does not work here for some reason
             setTimeout(function() {
-                node.style.height = endHeight ? endHeight + 'px' : '0';
-                node.style.paddingTop = endHeight ? sizes.padTop + 'px' : 0;
-                node.style.paddingBottom = endHeight ? sizes.padBot + 'px' : 0;
-            },1);
+                node.style.transition = transition;
+                setTimeout(function() {
+                    node.style.height = endHeight ? endHeight + 'px' : '0';
+                    node.style.paddingTop = endHeight ? sizes.padTop + 'px' : 0;
+                    node.style.paddingBottom = endHeight ? sizes.padBot + 'px' : 0;
+                },1);
+            }, 1);
+
         },
 
         collapse: function(node, immediate, callback, height) {
