@@ -6,7 +6,7 @@
     //
     // confirmed: need double requestAnimationFrame for height and edge cases
 
-    function handleCallback(node, immediate, callback, type) {
+    function handleCallback(node, immediate, callback) {
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
         if (cb && immediate !== true) {
             on.once(node, 'transitionend', function() {
@@ -46,7 +46,18 @@
             }
 
             //console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
-            //console.log('sizes', sizes);
+            //console.log('is animating: ', node.style.transition);
+
+            if(!!node.style.transition){
+                console.log('is animating', endHeight);
+                dom.style(node, {
+                    height: endHeight,
+                    paddingTop: endHeight ? sizes.padTop + 'px' : 0,
+                    paddingBottom: endHeight ? sizes.padBot + 'px' : 0
+                });
+                handleCallback(node, immediate, callback);
+                return;
+            }
 
             if(immediate || (styledHeight === endHeight && !hasBeg) || begHeight === endHeight){
                 dom.style(node, {
@@ -73,13 +84,14 @@
             //if(hasBeg) debugger
 
             on.once(node, 'transitionend', function() {
+                console.log('TRANSEND');
                 dom.style(node, {
                     transition: '',
-                    height: isAuto ? '' : endHeight + 'px',
+                    //height: isAuto ? '' : endHeight + 'px',
                     display: !!endHeight ? '' : 'none'
                 });
             });
-            handleCallback(node, immediate, callback, 'collapse');
+            handleCallback(node, immediate, callback);
 
             // tick does not work here for some reason
             setTimeout(function() {
