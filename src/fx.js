@@ -26,11 +26,12 @@
 
         height: function (node, options) {
             var
+                isAnimating = !!node.style.transition,
                 callback = options.callback,
                 immediate = options.immediate || false,
-                sizes = getSizes(node),
-                actualHeight = sizes.height,
-                styledHeight = dom.style(node, 'height'),
+                sizes = isAnimating ? {} : getSizes(node),
+                actualHeight = isAnimating ? 0 : sizes.height,
+                styledHeight = isAnimating ? 0 : dom.style(node, 'height'),
                 begHeight = options.startHeight !== undefined ? options.startHeight : styledHeight,
                 endHeight = options.height || 0,
                 speed = options.speed || 200,
@@ -84,7 +85,7 @@
             //if(hasBeg) debugger
 
             on.once(node, 'transitionend', function() {
-                console.log('TRANSEND');
+                console.log('TRANSEND', endHeight);
                 dom.style(node, {
                     transition: '',
                     //height: isAuto ? '' : endHeight + 'px',
