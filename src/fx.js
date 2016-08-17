@@ -11,7 +11,6 @@
         if (cb && immediate !== true) {
             on.once(node, 'transitionend', function() {
                 setTimeout(cb, 500);
-                //cb();
             });
         }
     }
@@ -22,7 +21,108 @@
         window.requestAnimationFrame(callback);
     }
 
+    function getStyle (node, key, value) {
+        if(value !== undefined && value !== 'auto'){
+            return value;
+        }
+        var sizes = getSizes(node);
+        if(value !== 'auto' && sizes.current[key] !== undefined && sizes.current[key] !== ''){
+            return sizes.current[key];
+        }
+        return sizes[key];
+
+    }
+
+    function getSpeed (s1, s2, ds) {
+        var i, a = arguments;
+        for(i = 0; i < a.length; i++){
+            if(a[i] !== undefined){
+                return typeof a[i] === 'number' ? a[i] + 'ms' : a[i];
+            }
+        }
+        return 0;
+    }
+
     var fx = {
+
+        style: function (node, options) {
+            // options:
+            //  callback
+            //  immediate
+            //  speed
+
+            var
+                keys = {
+                    callback:1,
+                    immediate:1,
+                    speed:1,
+                    ease:1
+                },
+                begStyle = {display:''},
+                endStyle = {display:''},
+                isAnimating = !!node.style.transition,
+                defaultSpeed = 500,
+                defaultEase = 'ease',
+                hasSizes = false,
+                transitions = [];
+
+            Object.keys(options).forEach(function (key) {
+                if(keys[key]){
+                    keys[key] = options[key];
+                }else{
+                    console.log('key', key, options[key]);
+                    begStyle[key] = getStyle(node, key, options[key].beg);
+                    endStyle[key] = getStyle(node, key, options[key].end);
+                    transitions.push(key + ' ' + getSpeed(options[key].speed, options.speed, defaultSpeed) + ' ' + (options[key].ease || options.ease || defaultEase));
+                    if(key === 'height' || key === 'width'){
+                        begStyle.overflow = endStyle.overflow = 'hidden';
+                        hasSizes = true;
+                        // TODO do padding
+                        // TODO ontransend, if 0, display none - include opacity
+                    }
+                }
+            });
+
+            if(isAnimating){
+                console.log('isAnimating ASSUME END');
+                dom.style(node, endStyle);
+                handleCallback(node, options.immediate, options.callback);
+                return;
+            }
+
+            if(options.immediate){
+                console.log('immediate ASSUME END');
+                dom.style(node, endStyle);
+                if(options.callback){
+                    tick(options.callback);
+                }
+                return;
+            }
+
+            on.once(node, 'transitionend', function() {
+                console.log('TRANSEND');
+                dom.style(node, {
+                    transition: '',
+                    //display: !!endHeight ? '' : 'none'
+                });
+            });
+
+            handleCallback(node, options.immediate, options.callback);
+
+            dom.style(node, begStyle);
+            console.log('beg', begStyle);
+
+            // tick does not work here for some reason
+            setTimeout(function() {
+                node.style.transition = transitions.join(', ');
+                setTimeout(function() {
+                    console.log('end', endStyle);
+                    dom.style(node, endStyle);
+                },1);
+            }, 1);
+
+            // return animation object that can be reversed
+        },
 
         height: function (node, options) {
             var
@@ -49,7 +149,7 @@
             //console.log('styledHeight', styledHeight, 'begHeight', begHeight, 'endHeight', endHeight, 'actualHeight', actualHeight);
             //console.log('is animating: ', node.style.transition);
 
-            if(!!node.style.transition){
+            if(isAnimating){
                 console.log('is animating', endHeight);
                 dom.style(node, {
                     height: endHeight,
@@ -260,12 +360,18 @@
             prevPadTop = dom.style(node, 'paddingTop'),
             prevPadBot = dom.style(node, 'paddingBottom'),
             previousDisplay = node.style.display,
-            previousHeight = dom.style(node, 'height');
+            previousHeight = node.style.height,
+            previousWidth = node.style.width;
 
-        node.style.height = '';
-        node.style.display = '';
+        if(previousHeight){
+            previousHeight = parseInt(previousHeight, 0);
+        }
+        if(previousWidth){
+            previousWidth = parseInt(previousWidth, 0);
+        }
 
         dom.style(node, {
+            width: '',
             height: '',
             display: '',
             paddingTop: '',
@@ -277,6 +383,7 @@
         padBot = parseInt(dom.style(node, 'paddingBottom'), 10);
 
         dom.style(node, {
+            width: previousWidth,
             height: previousHeight,
             display: previousDisplay,
             paddingTop: prevPadTop,
@@ -287,6 +394,10 @@
         box.padTop = padTop;
         box.padBot = padBot;
         box.boxSizing = boxSizing;
+        box.current = {
+            width: previousWidth,
+            height: previousHeight
+        };
 
         return box;
 

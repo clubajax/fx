@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <title>demo fx.style</title>
+    <script src="https://rawgit.com/clubajax/dom/v1.1.0/src/dom.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/key-poly.js"></script>
+    <script src="https://rawgit.com/clubajax/on/master/src/on.js"></script>
+    <script src="../src/fx.js"></script>
+    <style>
+        body{
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .fade-me{
+            border: 1px solid #666;
+            background: #ffb5b7;
+            padding: 10px;
+            display: inline-block;
+            margin: 20px;
+        }
+        .fade-me{
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <h1>fx demo.style</h1>
+    <div class="fade-me" id="1">
+        This div is for tests
+    </div>
+    <script>
+
+        var node = dom.byId('1');
+
+        function width () {
+            fx.style(node, {
+                width: {
+                    end: 0
+                },
+                callback: function () {
+
+                    fx.style(node, {
+                        width: {
+                            end: 'auto'
+                        },
+                        callback: function () {
+                            console.log('DONE');
+                        }
+                    });
+                }
+            });
+        }
+
+        function opacity() {
+            fx.style(node, {
+                opacity:{
+                    beg: 1,
+                    end: 0
+                },
+                callback: function () {
+                    fx.style(node, {
+                        opacity:{
+                            beg: 0,
+                            end: 1
+                        },
+                        callback: function () {
+                            width();
+                        }
+                    });
+                }
+            });
+        }
+
+        //opacity();
+        width();
+
+    </script>
+</body>
+</html>
