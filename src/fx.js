@@ -1,12 +1,9 @@
-(function () {
+(function (define) {
+    define(['dom'], function (dom) {
 
     'use strict';
     // fx.js
     // component effect functions
-
-    // [97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
-
-    // backColor
 
     function camelToDash (str) {
         if(str.indexOf('-') > -1){ return str; }
@@ -479,5 +476,26 @@
 
     }
 
-    window.fx = fx;
-}());
+        if (typeof window !== 'undefined') {
+            // global
+            window.fx = fx;
+        }
+        else if (typeof module !== 'undefined') {
+            //CJS
+            module.exports = fx;
+        }
+        else {
+            // AMD
+            return fx;
+        }
+
+    });
+}(
+    typeof define == 'function' && define.amd ? define : function (ids, factory) {
+        var deps = ids.map(function (id) {
+            return typeof require == 'function' ? require(id) : window[id];
+        });
+        typeof module !== 'undefined' ? module.exports = factory.apply(null, deps) : factory.apply(null, deps);
+    }
+
+));
