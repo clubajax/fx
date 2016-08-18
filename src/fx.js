@@ -27,7 +27,7 @@
             return value;
         }
         sizes = sizes || getSizes(node);
-        console.log('sizes', sizes);
+        //console.log('sizes', sizes);
         if(value !== 'auto' && sizes.current[key] !== undefined && sizes.current[key] !== ''){
             return sizes.current[key];
         }
@@ -65,10 +65,13 @@
                 keys = {
                     callback:1,
                     immediate:1,
+                    delay: 1,
                     speed:1,
-                    ease:1
+                    ease:1,
+                    hide:1
                 },
                 sizes,
+                cssText = node.style.cssText,
                 previousOverflow,
                 begStyle = {display:''},
                 endStyle = {display:''},
@@ -76,6 +79,7 @@
                 defaultSpeed = 500,
                 defaultEase = 'ease',
                 hasSizes = false,
+                isAuto,
                 transitions = [];
 
             Object.keys(options).forEach(function (key) {
@@ -87,12 +91,19 @@
                     begStyle[key] = getStyle(node, key, options[key].beg, sizes);
                     endStyle[key] = getStyle(node, key, options[key].end, sizes);
                     transitions.push(key + ' ' + getSpeed(options[key].speed, options.speed, defaultSpeed) + ' ' + (options[key].ease || options.ease || defaultEase));
+                    if(options[key].end === 'auto'){
+                        isAuto = true;
+                    }
                     if(key === 'height' || key === 'width'){
                         begStyle.overflow = endStyle.overflow = 'hidden';
                         hasSizes = true;
                         previousOverflow = node.style.overflow;
                         addPaddingStyle(begStyle, endStyle, sizes, key);
-                        // TODO ontransend, if 0, display none - include opacity
+                    }
+                    console.log('', key, options.height.end,  sizes.boxSizing);
+                    if(key === 'height' && options.height.end === 'auto' && sizes.boxSizing === 'content-box'){
+                        console.log('ACTUAL');
+                        endStyle.height = sizes.actual.height;//actualHeight + sizes.padBot + sizes.padTop;
                     }
                 }
             });
@@ -115,15 +126,21 @@
 
             on.once(node, 'transitionend', function() {
                 console.log('TRANSEND');
-                dom.style(node, {
-                    transition: ''
-                    //display: !!endHeight ? '' : 'none'
-                });
-                if(previousOverflow && endStyle.height > 0 || endStyle.width > 0){
-                    node.style.overflow = previousOverflow;
+                node.style.transition = '';
+                //if(previousOverflow && endStyle.height > 0 || endStyle.width > 0){
+                //    // TODO: prev CSStext?
+                //    console.log('cssText', cssText);
+                //    node.style.overflow = previousOverflow;
+                //}
+
+                if(isAuto){
+                    var resetObject = {};
+                    Object.keys(endStyle).forEach(function (key) {
+                        resetObject[key] = '';
+                    });
+                    dom.style(node, resetObject);
                 }
 
-                console.log('hide', options.hide , endStyle.height > 0 , endStyle.width > 0 , endStyle.opacity);
                 if(options.hide && (endStyle.height === 0 || endStyle.width === 0 || endStyle.opacity === 0)){
                     node.style.display = 'none';
                 }
@@ -392,6 +409,11 @@
         return 0;
     }
 
+    function normalize (node, prop) {
+        var value = node.style[prop];
+        return value ? parseInt(value, 10) : value;
+    }
+
     function getSizes (node) {
         var
             box,
@@ -399,18 +421,11 @@
             padTop,
             padBot,
             boxSizing = dom.style(node, 'box-sizing'),
-            prevPadTop = dom.style(node, 'paddingTop'),
-            prevPadBot = dom.style(node, 'paddingBottom'),
+            prevPadTop = normalize(node, 'paddingTop'),
+            prevPadBot = normalize(node, 'paddingBottom'),
             previousDisplay = node.style.display,
-            previousHeight = node.style.height,
-            previousWidth = node.style.width;
-
-        if(previousHeight){
-            previousHeight = parseInt(previousHeight, 0);
-        }
-        if(previousWidth){
-            previousWidth = parseInt(previousWidth, 0);
-        }
+            previousHeight = normalize(node, 'height'),
+            previousWidth = normalize(node, 'width');
 
         dom.style(node, {
             width: '',
@@ -439,6 +454,10 @@
         box.current = {
             width: previousWidth,
             height: previousHeight
+        };
+        box.actual = {
+            width: box.width,
+            height: box.height - padTop - padBot
         };
 
         return box;

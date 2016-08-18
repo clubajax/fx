@@ -18,7 +18,6 @@
             border: 1px solid #666;
             background: #ffb5b7;
             padding: 10px;
-            display: inline-block;
             margin: 20px;
         }
         .b-box{
@@ -27,17 +26,26 @@
         .c-box{
             background: #fffab7;
         }
+        .container{
+            display: inline-block;
+            width: 300px;
+        }
     </style>
 </head>
 <body>
     <h1>fx style test</h1>
     <div id="mocha"></div>
-    <div class="box b-box" id="1">
-        This div is border-box
+    <div class="container">
+        <div class="box b-box" id="1">
+            This div is border-box
+        </div>
     </div>
-    <div class="box c-box" id="2">
-        This div is content-box
+    <div class="container">
+        <div class="box c-box" id="2">
+            This div is content-box
+        </div>
     </div>
+
     <script>
 
         mocha.setup('tdd');
@@ -141,7 +149,7 @@
             });
 
             suite('fx.style.height', function () {
-                test('it should change the height to 0 and then back', function (done) {
+                xtest('it should change the height to 0 and then back', function (done) {
                     var node = dom.byId('1');
 
                     fx.style(node, {
@@ -150,17 +158,74 @@
                             end: 0
                         },
                         speed: 500,
-                        delay: 500,
+                        delay: 100,
                         hide: true,
                         callback: function () {
-
-                            //done(); return;
-
                             expect(dom.style(node, 'height')).to.equal(0);
                             expect(node.style.transition).to.equal('');
                             fx.style(node, {
                                 height: {
                                     beg: 0,
+                                    end: 'auto'
+                                },
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'height')).to.equal(40);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should change the height to 0 and then back (content-box)', function (done) {
+                    var node = dom.byId('2');
+
+                    fx.style(node, {
+                        height: {
+                            beg: 'auto',
+                            end: 0
+                        },
+                        speed: 1200,
+                        delay: 100,
+                        hide: true,
+                        callback: function () {
+                            expect(dom.style(node, 'height')).to.equal(0);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                height: {
+                                    beg: 0,
+                                    end: 'auto'
+                                },
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'height')).to.equal(18);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                xtest('it should change the height to 200 and then back', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        height: {
+                            beg: 'auto',
+                            end: 200
+                        },
+                        speed: 500,
+                        delay: 100,
+                        hide: true,
+                        callback: function () {
+                            expect(dom.style(node, 'height')).to.equal(200);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                height: {
+                                    beg: 200,
                                     end: 'auto'
                                 },
                                 speed: 200,
