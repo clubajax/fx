@@ -22,11 +22,12 @@
         window.requestAnimationFrame(callback);
     }
 
-    function getStyle (node, key, value) {
+    function getStyle (node, key, value, sizes) {
         if(value !== undefined && value !== 'auto'){
             return value;
         }
-        var sizes = getSizes(node);
+        sizes = sizes || getSizes(node);
+        console.log('sizes', sizes);
         if(value !== 'auto' && sizes.current[key] !== undefined && sizes.current[key] !== ''){
             return sizes.current[key];
         }
@@ -34,15 +35,23 @@
 
     }
 
-    function getSpeed (s1, s2, ds) {
-        var i, a = arguments;
-        for(i = 0; i < a.length; i++){
-            if(a[i] !== undefined){
-                return typeof a[i] === 'number' ? a[i] + 'ms' : a[i];
+    function addPaddingStyle (begStyle, endStyle, sizes, key) {
+        if(key === 'height'){
+            if(endStyle.height === 0){
+                endStyle.paddingTop = 0;
+                endStyle.paddingBottom = 0;
+                begStyle.paddingTop = sizes.padTop + 'px';
+                begStyle.paddingBottom = sizes.padBot + 'px';
+            }
+            else if(begStyle.height === 0){
+                endStyle.paddingTop = sizes.padTop + 'px';
+                endStyle.paddingBottom = sizes.padBot + 'px';
+                begStyle.paddingTop = 0;
+                begStyle.paddingBottom = 0;
             }
         }
-        return 0;
     }
+
 
     var fx = {
 
@@ -59,6 +68,8 @@
                     speed:1,
                     ease:1
                 },
+                sizes,
+                previousOverflow,
                 begStyle = {display:''},
                 endStyle = {display:''},
                 isAnimating = !!node.style.transition,
@@ -72,13 +83,15 @@
                     keys[key] = options[key];
                 }else{
                     console.log('key', key, options[key]);
-                    begStyle[key] = getStyle(node, key, options[key].beg);
-                    endStyle[key] = getStyle(node, key, options[key].end);
+                    sizes = sizes || getSizes(node);
+                    begStyle[key] = getStyle(node, key, options[key].beg, sizes);
+                    endStyle[key] = getStyle(node, key, options[key].end, sizes);
                     transitions.push(key + ' ' + getSpeed(options[key].speed, options.speed, defaultSpeed) + ' ' + (options[key].ease || options.ease || defaultEase));
                     if(key === 'height' || key === 'width'){
                         begStyle.overflow = endStyle.overflow = 'hidden';
                         hasSizes = true;
-                        // TODO do padding
+                        previousOverflow = node.style.overflow;
+                        addPaddingStyle(begStyle, endStyle, sizes, key);
                         // TODO ontransend, if 0, display none - include opacity
                     }
                 }
@@ -106,22 +119,38 @@
                     transition: ''
                     //display: !!endHeight ? '' : 'none'
                 });
+                if(previousOverflow && endStyle.height > 0 || endStyle.width > 0){
+                    node.style.overflow = previousOverflow;
+                }
+
+                console.log('hide', options.hide , endStyle.height > 0 , endStyle.width > 0 , endStyle.opacity);
+                if(options.hide && (endStyle.height === 0 || endStyle.width === 0 || endStyle.opacity === 0)){
+                    node.style.display = 'none';
+                }
                 console.log('trans:', node.style.transition);
             });
 
             handleCallback(node, options.immediate, options.callback);
 
-            dom.style(node, begStyle);
-            console.log('beg', begStyle);
+            function exec () {
+                dom.style(node, begStyle);
+                console.log('beg', begStyle);
 
-            // tick does not work here for some reason
-            setTimeout(function() {
-                node.style.transition = transitions.join(', ');
-                setTimeout(function() {
-                    console.log('end', endStyle);
-                    dom.style(node, endStyle);
-                },1);
-            }, 1);
+                // tick does not work here for some reason
+                setTimeout(function () {
+                    node.style.transition = transitions.join(', ');
+                    setTimeout(function () {
+                        console.log('end', endStyle);
+                        dom.style(node, endStyle);
+                    }, 1);
+                }, 1);
+            }
+
+            if(options.delay){
+                setTimeout(exec, options.delay);
+            }else{
+                exec();
+            }
 
             // return animation object that can be reversed
         },
@@ -153,6 +182,7 @@
 
             if(isAnimating){
                 console.log('is animating', endHeight);
+                // TODO: get end
                 dom.style(node, {
                     height: endHeight,
                     paddingTop: endHeight ? sizes.padTop + 'px' : 0,
@@ -352,6 +382,16 @@
         return num;
     }
 
+    function getSpeed (s1, s2, ds) {
+        var i, a = arguments;
+        for(i = 0; i < a.length; i++){
+            if(a[i] !== undefined){
+                return typeof a[i] === 'number' ? a[i] + 'ms' : a[i];
+            }
+        }
+        return 0;
+    }
+
     function getSizes (node) {
         var
             box,
@@ -392,7 +432,7 @@
             paddingBottom: prevPadBot
         });
 
-        box.height = box.height - padTop - padBot;
+        //box.height = box.height - padTop - padBot;
         box.padTop = padTop;
         box.padBot = padBot;
         box.boxSizing = boxSizing;

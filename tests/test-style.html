@@ -56,7 +56,7 @@
             function xtest() {
             }
 
-            suite('fx.opacity', function () {
+            xsuite('fx.style.opacity', function () {
                 test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
 
@@ -140,6 +140,40 @@
                 });
             });
 
+            suite('fx.style.height', function () {
+                test('it should change the height to 0 and then back', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        height: {
+                            beg: 'auto',
+                            end: 0
+                        },
+                        speed: 500,
+                        delay: 500,
+                        hide: true,
+                        callback: function () {
+
+                            //done(); return;
+
+                            expect(dom.style(node, 'height')).to.equal(0);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                height: {
+                                    beg: 0,
+                                    end: 'auto'
+                                },
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'height')).to.equal(40);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
         });
 
         mocha.run();
