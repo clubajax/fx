@@ -70,6 +70,36 @@
             function xtest() {
             }
 
+            suite('fx.style.misc', function () {
+                test('it should change background color', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        backgroundColor:{
+                            beg:'rgb(255, 181, 183)',
+                            end:'rgb(0, 0, 255)'
+                        },
+                        speed: time,
+                        callback: function () {
+                            expect(dom.style(node, 'backgroundColor')).to.equal('rgb(0, 0, 255)');
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                backgroundColor:{
+                                    beg:'#0000ff',
+                                    end:'#ffb5b7'
+                                },
+                                speed: time,
+                                callback: function () {
+                                    expect(dom.style(node, 'backgroundColor')).to.equal('rgb(255, 181, 183)');
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
             xsuite('fx.style.opacity', function () {
                 test('it should use opacity to fade out and in', function (done) {
                     var node = dom.byId('1');
@@ -152,9 +182,24 @@
                         }
                     });
                 });
+
+                test('it should still callback if beg and end are the same', function (done) {
+                    var node = dom.byId('1');
+                    fx.style(node, {
+                        opacity:{
+                            beg:1,
+                            end:1
+                        },
+                        speed: 200,
+                        callback: function () {
+                            expect(true).to.equal(true);
+                            done();
+                        }
+                    });
+                });
             });
 
-            suite('fx.style.height', function () {
+            xsuite('fx.style.height', function () {
                 test('it should change the height to 0 and then back', function (done) {
                     var node = dom.byId('1');
 
@@ -272,7 +317,7 @@
                 });
             });
 
-            suite('fx.style.width', function () {
+            xsuite('fx.style.width', function () {
                 test('it should change the width to 0 and then back', function (done) {
                     var node = dom.byId('1');
 

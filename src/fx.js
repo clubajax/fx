@@ -3,8 +3,20 @@
     'use strict';
     // fx.js
     // component effect functions
-    //
-    // confirmed: need double requestAnimationFrame for height and edge cases
+
+    // [97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
+
+    // backColor
+
+    function camelToDash (str) {
+        if(str.indexOf('-') > -1){ return str; }
+        for(var i = str.length - 1; i >= 0; i--){
+            if(str.charAt(i) !== '-' && str.charCodeAt(i) <= 90){
+                str = str.substring(0, i) + '-' + str.charAt(i).toLowerCase() + str.substring(i+1);
+            }
+        }
+        return str;
+    }
 
     function handleCallback(node, immediate, callback) {
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
@@ -65,7 +77,7 @@
 
 
     var fx = {
-
+        camelToDash: camelToDash,
         style: function (node, options) {
             // options:
             //  callback
@@ -101,7 +113,7 @@
                     sizes = sizes || getSizes(node);
                     begStyle[key] = getStyle(node, key, options[key].beg, sizes);
                     endStyle[key] = getStyle(node, key, options[key].end, sizes);
-                    transitions.push(key + ' ' + getSpeed(options[key].speed, options.speed, defaultSpeed) + ' ' + (options[key].ease || options.ease || defaultEase));
+                    transitions.push(camelToDash(key) + ' ' + getSpeed(options[key].speed, options.speed, defaultSpeed) + ' ' + (options[key].ease || options.ease || defaultEase));
                     if(options[key].end === 'auto'){
                         isAuto = true;
                     }
