@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <title>Test fx.style</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.css">
+    <script src="../bower_components/dom/src/dom.js"></script>
+    <script src="../bower_components/on/src/key-poly.js"></script>
+    <script src="../bower_components/on/src/on.js"></script>
+    <script src="../src/fx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.5.3/mocha.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
+    <style>
+        body{
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .box{
+            border: 1px solid #666;
+            background: #ffb5b7;
+            padding: 10px;
+            display: inline-block;
+            margin: 20px;
+        }
+        .b-box{
+            box-sizing: border-box;
+        }
+        .c-box{
+            background: #fffab7;
+        }
+    </style>
+</head>
+<body>
+    <h1>fx style test</h1>
+    <div id="mocha"></div>
+    <div class="box b-box" id="1">
+        This div is border-box
+    </div>
+    <div class="box c-box" id="2">
+        This div is content-box
+    </div>
+    <script>
+
+        mocha.setup('tdd');
+
+        suite('fx', function() {
+            this.timeout(3000);
+            var suite = window.suite,
+                test = window.test,
+                dom = window.dom,
+                on = window.on,
+                expect = chai.expect;
+
+            function xsuite() {
+            }
+
+            function xtest() {
+            }
+
+            suite('fx.opacity', function () {
+                test('it should use opacity to fade out and in', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        opacity:{
+                            beg:1,
+                            end:0
+                        },
+                        speed: 200,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                opacity:{
+                                    beg:0,
+                                    end:1
+                                },
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should use opacity to fade out and in immediately', function (done) {
+                    var node = dom.byId('1');
+                    fx.style(node, {
+                        opacity:{
+                            beg:1,
+                            end:0
+                        },
+                        immediate: true,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                opacity:{
+                                    beg:0,
+                                    end:1
+                                },
+                                immediate: true,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should use opacity to fade out to 0.2 and back in', function (done) {
+                    var node = dom.byId('1');
+                    fx.style(node, {
+                        opacity:{
+                            beg:1,
+                            end:0.2
+                        },
+                        speed: 200,
+                        callback: function () {
+                            expect(dom.style(node, 'opacity')).to.equal(0.2);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                opacity:{
+                                    beg:0.2,
+                                    end:1
+                                },
+                                speed: 200,
+                                callback: function () {
+                                    expect(dom.style(node, 'opacity')).to.equal(1);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
+        });
+
+        mocha.run();
+
+    </script>
+</body>
+</html>

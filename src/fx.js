@@ -10,12 +10,13 @@
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
         if (cb && immediate !== true) {
             on.once(node, 'transitionend', function() {
-                setTimeout(cb, 500);
+                setTimeout(function () {
+                    console.log('callback');
+                    cb();
+                }, 500);
             });
         }
     }
-
-    // TODO: a special function for handling multiple animations with a single transitionend
 
     function tick (callback) {
         window.requestAnimationFrame(callback);
@@ -102,9 +103,10 @@
             on.once(node, 'transitionend', function() {
                 console.log('TRANSEND');
                 dom.style(node, {
-                    transition: '',
+                    transition: ''
                     //display: !!endHeight ? '' : 'none'
                 });
+                console.log('trans:', node.style.transition);
             });
 
             handleCallback(node, options.immediate, options.callback);
