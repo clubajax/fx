@@ -70,7 +70,7 @@
             function xtest() {
             }
 
-            suite('fx.style.combinations', function () {
+            xsuite('fx.style.combinations', function () {
                 test('it should change the width and height', function (done) {
                     var node = dom.byId('1');
 
@@ -164,8 +164,8 @@
                 });
             });
 
-            xsuite('fx.style.misc', function () {
-                test('it should change background color', function (done) {
+            suite('fx.style.misc', function () {
+                xtest('it should change background color', function (done) {
                     var node = dom.byId('1');
 
                     fx.style(node, {
@@ -187,6 +187,43 @@
                                     expect(dom.style(node, 'backgroundColor')).to.equal('rgb(255, 181, 183)');
                                     expect(node.style.transition).to.equal('');
                                     done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should transform', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        transform:{
+                            beg:'scaleX(1) scaleY(1)',
+                            end:'scaleX(3) scaleY(3)'
+                        },
+                        speed: time,
+                        callback: function () {
+                            //expect(dom.style(node, 'backgroundColor')).to.equal('rgb(0, 0, 255)');
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                transform:{
+                                    end:'scaleX(0) scaleY(0)',
+                                    beg:'scaleX(3) scaleY(3)'
+                                },
+                                speed: time,
+                                callback: function () {
+                                    fx.style(node, {
+                                        transform:{
+                                            end:'scaleX(1) scaleY(1)',
+                                            beg:'scaleX(0) scaleY(0)'
+                                        },
+                                        speed: time,
+                                        callback: function () {
+                                            //expect(dom.style(node, 'backgroundColor')).to.equal('rgb(255, 181, 183)');
+                                            expect(node.style.transition).to.equal('');
+                                            done();
+                                        }
+                                    });
                                 }
                             });
                         }
