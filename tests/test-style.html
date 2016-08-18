@@ -70,7 +70,101 @@
             function xtest() {
             }
 
-            suite('fx.style.misc', function () {
+            suite('fx.style.combinations', function () {
+                test('it should change the width and height', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        width:{
+                            beg: 'auto',
+                            end: 0
+                        },
+                        height:{
+                            beg: 'auto',
+                            end: 0
+                        },
+                        speed: time,
+                        callback: function () {
+                            expect(dom.style(node, 'height')).to.equal(0);
+                            expect(dom.style(node, 'width')).to.equal(0);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                width:{
+                                    beg: 0,
+                                    end: 'auto'
+                                },
+                                height:{
+                                    beg: 0,
+                                    end: 'auto'
+                                },
+                                speed: time,
+                                callback: function () {
+                                    expect(dom.style(node, 'height')).to.equal(40);
+                                    expect(dom.style(node, 'width')).to.equal(260);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                test('it should change size and color', function (done) {
+                    var node = dom.byId('1');
+
+                    fx.style(node, {
+                        width:{
+                            beg: 'auto',
+                            end: 400
+                        },
+                        height:{
+                            beg: 'auto',
+                            end: 300
+                        },
+                        backgroundColor:{
+                            beg:'rgb(255, 181, 183)',
+                            end: 'rgb(0, 0, 0)'
+                        },
+                        color:{
+                            beg: 'rgb(0, 0, 0)',
+                            end: 'rgb(255, 255, 255)'
+                        },
+                        speed: 500,
+                        callback: function () {
+                            expect(dom.style(node, 'height')).to.equal(300);
+                            expect(dom.style(node, 'width')).to.equal(400);
+                            expect(node.style.transition).to.equal('');
+                            fx.style(node, {
+                                width:{
+                                    beg: 400,
+                                    end: 'auto'
+                                },
+                                height:{
+                                    beg: 300,
+                                    end: 'auto'
+                                },
+                                backgroundColor:{
+                                    end:'rgb(255, 181, 183)',
+                                    beg: 'rgb(0, 0, 0)'
+                                },
+                                color:{
+                                    end: 'rgb(0, 0, 0)',
+                                    beg: 'rgb(255, 255, 255)'
+                                },
+                                speed: 500,
+                                callback: function () {
+                                    expect(dom.style(node, 'height')).to.equal(40);
+                                    expect(dom.style(node, 'width')).to.equal(260);
+                                    expect(node.style.transition).to.equal('');
+                                    done();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+
+            xsuite('fx.style.misc', function () {
                 test('it should change background color', function (done) {
                     var node = dom.byId('1');
 
