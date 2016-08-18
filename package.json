@@ -2,7 +2,7 @@
 	"author": "Mike Wilcox @clubajax",
 	"name": "fx",
 	"main":"src/fx.js",
-	"description": "A utility for node animations",
+	"description": "A utility for node transitions",
 	"version": "0.8.0",
 	"license": "MIT",
     "readmeFilename": "README.md",
