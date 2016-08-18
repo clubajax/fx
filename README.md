@@ -67,16 +67,16 @@ additional properties:
  
 ### Optional style properties:
  
- * *speed*: The speed of this individual style transition. Note, `speed` can be used outside of style objects and apply to all styles.
- * *delay*: The delay before this individual style transition starts. Note, `delay` can be used outside of style objects and apply to all styles.
+ * *speed*: The speed, in milliseconds, of this individual style transition. Note, `speed` can be used outside of style objects and apply to all styles.
+ * *delay*: The delay, in milliseconds, before this individual style transition starts. Note, `delay` can be used outside of style objects and apply to all styles.
  * *ease*: The ease function applied to this individual style transition. Note, `ease` can be used outside of style objects and apply to all styles.
 
 ### Other Options
 
 These properties are used outside of the style objects (such as how `speed` is used in teh example above);
 
- * *speed*: The speed of all transitions.
- * *delay*: The delay before this all transitions start.
+ * *speed*: The speed, in milliseconds, of all transitions.
+ * *delay*: The delay, in milliseconds, before this all transitions start.
  * *hide*: When a key style (height, width, opacity) is set to zero, at the end of the transition, the node display will be set to none.
  * *ease*: The ease function applied to all transitions.
  * *immediate*: Will skip the transition and immediately apply the style.

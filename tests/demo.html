@@ -15,17 +15,15 @@
             border: 1px solid #666;
             background: #ffb5b7;
             padding: 10px;
-            display: inline-block;
             margin: 20px;
-        }
-        .fade-me{
             box-sizing: border-box;
+            width: 250px;
         }
     </style>
 </head>
 <body>
     <h1>fx demo</h1>
-    <div id="mocha"></div>
+    <button id="btn">repeat combo</button>
     <div class="fade-me" id="1">
         This div is for opacity tests
     </div>
@@ -98,8 +96,47 @@
                 }
             });
         }
-        scale();
+        //scale();
 
+        function comboDelayed () {
+            fx.style(node, {
+                height:{
+                    beg: 'auto',
+                    end: 150,
+                    delay: 150,
+                    speed: 333
+                },
+                width:{
+                    beg: 'auto',
+                    end: 500,
+                    speed: 1500,
+                    delay: 22
+                },
+                callback: function () {
+                    //return
+                    fx.style(node, {
+                        height:{
+                            end: 'auto',
+                            beg: 150,
+                            delay: 150,
+                            speed: 333
+                        },
+                        width:{
+                            end: 'auto',
+                            beg: 500,
+                            speed: 1500,
+                            delay: 22
+                        },
+                        callback: function () {
+
+                        }
+                    });
+                }
+            });
+        }
+        comboDelayed();
+
+        on('btn', 'click', comboDelayed);
     </script>
 </body>
 </html>
