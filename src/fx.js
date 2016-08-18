@@ -10,10 +10,7 @@
         var cb = typeof immediate === 'function' ? immediate : typeof callback === 'function' ? callback : null;
         if (cb && immediate !== true) {
             on.once(node, 'transitionend', function() {
-                setTimeout(function () {
-                    console.log('callback');
-                    cb();
-                }, 500);
+                setTimeout(cb, 100);
             });
         }
     }
@@ -48,6 +45,20 @@
                 endStyle.paddingBottom = sizes.padBot + 'px';
                 begStyle.paddingTop = 0;
                 begStyle.paddingBottom = 0;
+            }
+        }
+        else if(key === 'width'){
+            if(endStyle.width === 0){
+                endStyle.paddingLeft = 0;
+                endStyle.paddingRight = 0;
+                begStyle.paddingLeft = sizes.padLeft + 'px';
+                begStyle.paddingRight = sizes.padRight + 'px';
+            }
+            else if(begStyle.width === 0){
+                endStyle.paddingLeft = sizes.padLeft + 'px';
+                endStyle.paddingRight = sizes.padRight + 'px';
+                begStyle.paddingLeft = 0;
+                begStyle.paddingRight = 0;
             }
         }
     }
@@ -100,10 +111,9 @@
                         previousOverflow = node.style.overflow;
                         addPaddingStyle(begStyle, endStyle, sizes, key);
                     }
-                    console.log('', key, options.height.end,  sizes.boxSizing);
+
                     if(key === 'height' && options.height.end === 'auto' && sizes.boxSizing === 'content-box'){
-                        console.log('ACTUAL');
-                        endStyle.height = sizes.actual.height;//actualHeight + sizes.padBot + sizes.padTop;
+                        endStyle.height = sizes.content.height;
                     }
                 }
             });
@@ -125,7 +135,6 @@
             }
 
             on.once(node, 'transitionend', function() {
-                console.log('TRANSEND');
                 node.style.transition = '';
                 //if(previousOverflow && endStyle.height > 0 || endStyle.width > 0){
                 //    // TODO: prev CSStext?
@@ -144,20 +153,17 @@
                 if(options.hide && (endStyle.height === 0 || endStyle.width === 0 || endStyle.opacity === 0)){
                     node.style.display = 'none';
                 }
-                console.log('trans:', node.style.transition);
             });
 
             handleCallback(node, options.immediate, options.callback);
 
             function exec () {
                 dom.style(node, begStyle);
-                console.log('beg', begStyle);
 
                 // tick does not work here for some reason
                 setTimeout(function () {
                     node.style.transition = transitions.join(', ');
                     setTimeout(function () {
-                        console.log('end', endStyle);
                         dom.style(node, endStyle);
                     }, 1);
                 }, 1);
@@ -417,46 +423,43 @@
     function getSizes (node) {
         var
             box,
-            height,
+            boxSizing = dom.style(node, 'box-sizing'),
             padTop,
             padBot,
-            boxSizing = dom.style(node, 'box-sizing'),
-            prevPadTop = normalize(node, 'paddingTop'),
-            prevPadBot = normalize(node, 'paddingBottom'),
-            previousDisplay = node.style.display,
-            previousHeight = normalize(node, 'height'),
-            previousWidth = normalize(node, 'width');
+            padLeft,
+            padRight,
+            cssText = node.style.cssText;
 
         dom.style(node, {
             width: '',
             height: '',
             display: '',
             paddingTop: '',
-            paddingBottom: ''
+            paddingBottom: '',
+            paddingLeft:'',
+            paddingRight:''
         });
 
         box = dom.box(node);
         padTop = parseInt(dom.style(node, 'paddingTop'), 10);
         padBot = parseInt(dom.style(node, 'paddingBottom'), 10);
+        padLeft = parseInt(dom.style(node, 'paddingLeft'), 10);
+        padRight = parseInt(dom.style(node, 'paddingRight'), 10);
 
-        dom.style(node, {
-            width: previousWidth,
-            height: previousHeight,
-            display: previousDisplay,
-            paddingTop: prevPadTop,
-            paddingBottom: prevPadBot
-        });
+        // restore
+        node.style.cssText = cssText;
 
-        //box.height = box.height - padTop - padBot;
         box.padTop = padTop;
         box.padBot = padBot;
+        box.padLeft = padLeft;
+        box.padRight = padRight;
         box.boxSizing = boxSizing;
         box.current = {
-            width: previousWidth,
-            height: previousHeight
+            width: normalize(node, 'width'),
+            height: normalize(node, 'height')
         };
-        box.actual = {
-            width: box.width,
+        box.content = {
+            width: box.width - padLeft - padRight,
             height: box.height - padTop - padBot
         };
 
