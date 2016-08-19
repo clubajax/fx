@@ -268,26 +268,14 @@
 
         }
 
-        if (typeof window !== 'undefined') {
-            // global
-            window.fx = fx;
-        }
-        else if (typeof module !== 'undefined') {
-            //CJS
-            module.exports = fx;
-        }
-        else {
-            // AMD
-            return fx;
-        }
-
+        if (typeof customLoader === 'function'){ customLoader(fx, 'fx'); }
+        else if (typeof window !== 'undefined') { window.fx = fx; }
+        else if (typeof module !== 'undefined') { module.exports = fx; }
+        else { return fx; }
     });
 }(
     typeof define == 'function' && define.amd ? define : function (ids, factory) {
-        var deps = ids.map(function (id) {
-            return typeof require == 'function' ? require(id) : window[id];
-        });
+        var deps = ids.map(function (id) { return typeof require == 'function' ? require(id) : window[id]; });
         typeof module !== 'undefined' ? module.exports = factory.apply(null, deps) : factory.apply(null, deps);
     }
-
 ));
